@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head lang="en">
+    <meta charset="UTF-8"/>
+    <title></title>
+
+    <!-- thymeleaf引入js的方式 -->
+    <script th:src="@{/static/js/test.js}"></script>
+
+</head>
+<body>
+
+<div><!-- 第一种写法：类似于jsp的写法，对象.属性名 -->
+    用户姓名：<input th:id="${user.name}" th:name="${user.name}" th:value="${user.name}"/>
+    <br/>
+    用户年龄：<input th:value="${user.age}"/>
+    <br/>
+    用户生日：<input th:value="${user.birthday}"/>
+    <br/>
+    用户生日：<input th:value="${#dates.format(user.birthday, 'yyyy-MM-dd')}"/>
+    <br/>
+</div>
+<br/>
+
+<div th:object="${user}"><!-- 第二种写法：可以在父级标签（这里是div，table/li标签都是同理）中这样写，
+                            下面都通过*{属性名}来调用 -->
+    用户姓名：<input th:id="*{name}" th:name="*{name}" th:value="*{name}"/>
+    <br/>
+    用户年龄：<input th:value="*{age}"/>
+    <br/>
+    用户生日：<input th:value="*{#dates.format(birthday, 'yyyy-MM-dd hh:mm:ss')}"/>
+    <br/>
+</div>
+
+<br/>
+
+text 与 utext 的区别：后端传入html代码给user.desc属性，使用th:text时，会像显示普通字符串一样直接显示这些代码；
+而使用th:utext时，会将这样代码直接解析成css样试。<br/>
+<span th:text="${user.desc}">abc</span>
+<br/>
+<span th:utext="${user.desc}">abc</span>
+<br/>
+<br/>
+
+<!-- 类似jsp中引用<a href="XXXX">网站地址</a>的方式 -->
+URL:<br/>
+<a href="" th:href="@{http://www.imooc.com}">网站地址</a>
+<br/>
+
+<br/>
+<!-- form表单：-->
+<form th:action="@{/th/postform}" th:object="${user}" method="post" th:method="post">
+    <input type="text" th:field="*{name}"/><!-- th:field属性会解析成：id="name",name="name",value="*{name}" -->
+    <input type="text" th:field="*{age}"/>
+    <input type="submit"/>
+</form>
+<br/>
+
+<br/>
+<!-- 类似于<c:if> -->
+<div th:if="${user.age} == 18">十八岁的天空</div>
+<div th:if="${user.age} gt 18">你老了</div>
+<div th:if="${user.age} lt 18">你很年轻</div>
+<div th:if="${user.age} ge 18">大于等于</div>
+<div th:if="${user.age} le 18">小于等于</div>
+<br/>
+
+<br/>
+<!-- 选择框默认选定 -->
+<select>
+    <option>选择框</option>
+    <option th:selected="${user.name eq 'yuan'}">yuan</option>
+    <option th:selected="${user.name eq 'thymeleaf'}">thymeleaf</option>
+    <option th:selected="${user.name eq 'wangyuan'}">wangyuan</option>
+</select>
+<br/>
+
+<br/>
+<table>
+    <tr>
+        <th>姓名</th>
+        <th>年龄</th>
+        <th>年龄的备注</th>
+        <th>生日</th>
+    </tr>
+    <tr th:each="person:${userList}"><!-- person:XXX相当于jsp中var=person -->
+        <td th:text="${person.name}"></td>
+        <td th:text="${person.age}"></td>
+        <td th:text="${person.age gt 18} ? 你老了 : 你很年轻">18岁</td>
+        <td th:text="${#dates.format(user.birthday, 'yyyy-MM-dd hh:mm:ss')}"></td>
+    </tr>
+</table>
+<br/>
+
+<br/>
+<!-- switch判断语句的使用 -->
+<div th:switch="${user.name}">
+    <p th:case="'yuan'">yuan</p>
+    <p th:case="#{roles.manager}">普通管理员</p><!-- 读取i18n/message.properties配置文件中的内容，
+    具体如何读到i18n/message.properties配置文件，写在application.properties中 -->
+    <p th:case="#{roles.superadmin}">超级管理员</p>
+    <p th:case="*">其他用户</p>
+</div>
+<br/>
+
+</body>
+</html>
